@@ -1,4 +1,4 @@
-"""LLM Vector Database's custom exceptions.
+"""Robot-LLM's custom exceptions.
 
 This module contains the implementation of Custom Exceptions.
 
@@ -29,4 +29,13 @@ class MethodNotImplementedError(Exception):
 
     Args:
         Exception (Exception): MethodNotImplementedError
+    """
+
+
+class NeitherChatNorRequest(Exception):
+
+    """
+
+    Args:
+        Exception (Exception): NeitherChatNorRequest
     """

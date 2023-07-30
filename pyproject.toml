@@ -1,23 +1,23 @@
 [tool.poetry]
-name = "robotllm"
+name = "robot-llm"
 version = "0.1.0"
 description = "llm for robot decision making"
 authors = ["juicyjung <travelandi01@gmail.com>"]
 readme = "README.md"
+packages = [{include = "robot_llm"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pytest = "^7.4.0"
-openai = "^0.27.8"
 opencv-python = "^4.8.0.74"
+python-dotenv = "^1.0.0"
+openai = "^0.27.8"
 pandas = "^2.0.3"
 psutil = "^5.9.5"
-poetry-dotenv-plugin = "^0.2.0"
+pyyaml = "^6.0.1"
+ultralytics = "^8.0.145"
+pytest = "^7.4.0"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.ruff]
-line-length = 200

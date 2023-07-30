@@ -9,7 +9,7 @@ repos:
       - id: ruff
         name: ruff
         # Respect `exclude` and `extend-exclude` settings.
-        args: ["--force-exclude"]
+        args: ["--force-exclude", "--line-length=200"]
   - repo: local
     hooks:
       - id: pytest-check

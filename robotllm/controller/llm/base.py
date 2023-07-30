@@ -9,7 +9,7 @@ class LLM:
         return True
 
     @abstractmethod
-    def call(self, prompt: str) -> str:
+    def call(self, instruction: str, prompt: str) -> str:
         """
         Execute the LLM with given prompt.
 

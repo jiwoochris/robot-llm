@@ -1,8 +1,12 @@
 from .base import LLM
 from typing import Optional
 import os
+from dotenv import load_dotenv
 import openai
 from ...exceptions import APIKeyNotFoundError, UnsupportedOpenAIModelError
+
+
+load_dotenv()
 
 
 class OpenAI(LLM):
@@ -24,7 +28,6 @@ class OpenAI(LLM):
     def __init__(
         self,
         api_token: Optional[str] = None,
-        instruction: Optional[str] = None,
     ):
         self.api_token = api_token or os.getenv("OPENAI_API_KEY") or None
 
@@ -33,9 +36,7 @@ class OpenAI(LLM):
 
         openai.api_key = self.api_token
 
-        self.instruction = instruction
-
-    def call(self, prompt: str) -> str:
+    def call(self, instruction: str, prompt: str) -> str:
         """
         Call the OpenAI LLM.
 
@@ -50,16 +51,18 @@ class OpenAI(LLM):
         """
 
         if self.model in self._supported_chat_models:
-            response = openai.ChatCompletion.create(
+            completion = openai.ChatCompletion.create(
                 model=self.model,
                 messages=[
                     {
                         "role": "system",
-                        "content": f'{self.instruction}',
+                        "content": f"{instruction}",
                     },
                     {"role": "user", "content": prompt},
                 ],
             )
+
+            response = completion.choices[0].message.content.strip()
 
         else:
             raise UnsupportedOpenAIModelError("Unsupported model")
