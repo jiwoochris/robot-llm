@@ -16,32 +16,37 @@ class RobotLLM:
         self.yolo = yolo
         self.verbose = verbose
 
-        self.prompt = None
+        self.prompt = ""
 
         print("[Start] your AGI Robot. Nice to meet you")
 
     def input_text(self, prompt: str) -> str:
         # Perform user's query
 
-        self.prompt = prompt
+        self.prompt += "\nUser: " + prompt
 
         if self.verbose:
-            print(f"[User prompt] : {prompt}")
+            print(f"[User prompt] : {self.prompt}")
 
-        chat_or_request = self.chat_or_request(prompt)
+        chat_or_request = self.check_chat_or_request(prompt)
 
         if chat_or_request == "chat":
             response = self.just_talk(prompt)
-            return response
 
         elif chat_or_request == "request":
             response = self.conduct_request(prompt)
-            return "Mission accomplished"
 
         else:
             raise NeitherChatNorRequest("Neither chat nor request")
 
-    def chat_or_request(self, prompt: str) -> str:
+        if response == "Mission accomplished":
+            self.prompt = ""
+        else:
+            self.prompt += "\nAGI: " + response
+
+        return response
+
+    def check_chat_or_request(self, prompt: str) -> str:
         instruction = "You are AGI robot. Decide whether user prompt is just chat or request. Your response should be only 'chat' or 'request'"
 
         response = self.llm.call(instruction, prompt)
@@ -64,13 +69,15 @@ class RobotLLM:
         return response
 
     def conduct_request(self, prompt: str) -> str:
-        # Just talk with user
-
         instruction = (
-            """
-        You are AGI robot. Your goal is to call the appropriate functions.
-        Your response should be a python code to conduct user's request for exec.
-        """
+            """You are AGI robot. Your goal is to call the appropriate functions.
+Your response must be a python code to conduct user's request for exec.
+Or If any, ask follow-up question to user.
+
+eg. : What is in front of me now?
+result = self.take_picture()
+explanation = self.explain_result("take_picture", result)
+"""
             + "\n\n"
             + self.function_description
         )
@@ -78,12 +85,31 @@ class RobotLLM:
         response = self.llm.call(instruction, prompt)
 
         if self.verbose:
-            print("Generated Python code :")
+            print("Respond to request :")
             print(response)
 
-        exec(response)
+        if self.is_python_code(response):
+            exec(response)
+            return "Mission accomplished"
+        else:
+            return response  # eg. Sorry, I am not able to physically tidy a desk as I am an AI assistant. Is there anything else I can help you with?
+
+    def chat_or_request(self, prompt: str) -> str:
+        instruction = "You are AGI robot. Decide whether user prompt is just chat or request. Your response should be only 'chat' or 'request'"
+
+        response = self.llm.call(instruction, prompt)
+
+        if self.verbose:
+            print(f"Chat or Request? : {response}")
 
         return response
+
+    def is_python_code(self, code_str):
+        try:
+            compile(code_str, "<string>", "exec")
+            return True
+        except SyntaxError:
+            return False
 
     # sensor
 
@@ -108,6 +134,8 @@ class RobotLLM:
         cap.release()
         cv2.destroyAllWindows()
 
+        print(boxes_and_labels)
+
         return boxes_and_labels
 
     # actuator
@@ -115,7 +143,14 @@ class RobotLLM:
     def explain_result(self, function_name: str, result: str) -> str:
         # Just talk with user
 
-        instruction = f"You are AGI robot. You got the request :\n{self.prompt}\n\nHere is the result of the {function_name} take_picture(). Answer to user."
+        instruction = f"""You are AGI robot. You got the request :
+{self.prompt}
+        
+Here is the result of the {function_name} take_picture(). Answer to user."""
+
+        if self.verbose:
+            print("instruction :")
+            print(instruction)
 
         response = self.llm.call(instruction, str(result))
 
