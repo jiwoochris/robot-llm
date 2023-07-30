@@ -3,13 +3,13 @@ import openai
 # 보안을 위해 api_key.txt는 따로 보관
 api_key_file = "api_key.txt"
 
-with open(api_key_file, 'r') as file:
+with open(api_key_file, "r") as file:
     api_token = file.read()
-    
-    openai.api_key = api_token
-            
 
-LLM_prompt =  """
+    openai.api_key = api_token
+
+
+LLM_prompt = """
 These are the objects on the desk :
 'mug'.
 
@@ -45,7 +45,7 @@ response = openai.Completion.create(
     top_p=0.9,
     n=1,
     stream=False,
-    logprobs=None
+    logprobs=None,
 )
 
 
@@ -56,19 +56,21 @@ print(response.choices[0].text.strip())
 answer1 = response.choices[0].text.strip()
 
 
-
-
 import re
 
-match = re.search(r'Resulting question \( that can be answered by taking a picture of object \): (.*?)\n\n', answer1, re.DOTALL)
+match = re.search(
+    r"Resulting question \( that can be answered by taking a picture of object \): (.*?)\n\n",
+    answer1,
+    re.DOTALL,
+)
 
 print(match)
 
 if match:
     question = match.group(1)
     print(question)
-    
-    
+
+
 # No라고 가정하자
 answer_to_LLM_question = "No"
 
@@ -95,7 +97,6 @@ The best option is:
 """
 
 
-
 response = openai.Completion.create(
     model="text-davinci-003",
     prompt=action_plan,
@@ -104,7 +105,7 @@ response = openai.Completion.create(
     top_p=0.9,
     n=1,
     stream=False,
-    logprobs=None
+    logprobs=None,
 )
 
 

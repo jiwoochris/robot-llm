@@ -5,12 +5,13 @@
 # VLM_answer를 LLM에 넣기 (open ai)
 
 
-
 from transformers import InstructBlipProcessor, InstructBlipForConditionalGeneration
 import torch
 from PIL import Image
 
-model = InstructBlipForConditionalGeneration.from_pretrained("Salesforce/instructblip-vicuna-7b")
+model = InstructBlipForConditionalGeneration.from_pretrained(
+    "Salesforce/instructblip-vicuna-7b"
+)
 processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-vicuna-7b")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -45,27 +46,18 @@ generated_text = processor.batch_decode(outputs, skip_special_tokens=True)[0].st
 print(generated_text)
 
 
-
-
-
-
-
-
-
-
-
 import openai
 
 # 보안을 위해 api_key.txt는 따로 보관
 api_key_file = "api_key.txt"
 
-with open(api_key_file, 'r') as file:
+with open(api_key_file, "r") as file:
     api_token = file.read()
-    
+
     openai.api_key = api_token
 
 
-LLM_prompt =  """
+LLM_prompt = """
 These are the objects on the desk :
 'mug'.
 
@@ -138,7 +130,7 @@ response = openai.Completion.create(
     top_p=0.9,
     n=1,
     stream=False,
-    logprobs=None
+    logprobs=None,
 )
 
 
