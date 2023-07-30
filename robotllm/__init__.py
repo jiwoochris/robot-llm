@@ -26,7 +26,7 @@ class RobotLLM:
         self.prompt += "\nUser: " + prompt
 
         if self.verbose:
-            print(f"[User prompt] : {self.prompt}")
+            print(f"User prompt : {self.prompt}")
 
         chat_or_request = self.check_chat_or_request(prompt)
 
@@ -47,7 +47,7 @@ class RobotLLM:
         return response
 
     def check_chat_or_request(self, prompt: str) -> str:
-        instruction = "You are AGI robot. Decide whether user prompt is just chat or request. Your response should be only 'chat' or 'request'"
+        instruction = "You are AGI robot. Decide whether user's last prompt is just chat or request. Your response should be only 'chat' or 'request'"
 
         response = self.llm.call(instruction, prompt)
 
@@ -64,7 +64,7 @@ class RobotLLM:
         response = self.llm.call(instruction, prompt)
 
         if self.verbose:
-            print(response)
+            print(f"instruction : {instruction}")
 
         return response
 
@@ -72,11 +72,12 @@ class RobotLLM:
         instruction = (
             """You are AGI robot. Your goal is to call the appropriate functions.
 Your response must be a python code to conduct user's request for exec.
+Last function should be self.explain_result
 Or If any, ask follow-up question to user.
 
 eg. : What is in front of me now?
 result = self.take_picture()
-explanation = self.explain_result("take_picture", result)
+explanation = self.explain_result(result)
 """
             + "\n\n"
             + self.function_description
@@ -84,15 +85,20 @@ explanation = self.explain_result("take_picture", result)
 
         response = self.llm.call(instruction, prompt)
 
-        if self.verbose:
-            print("Respond to request :")
-            print(response)
-
         if self.is_python_code(response):
-            exec(response)
+            if self.verbose:
+                print("Code Generated :")
+                print(response)
+                print("\n")
+
+            try:
+                exec(response)
+            except AttributeError as e:
+                return "An error occurred: " + str(e)
+
             return "Mission accomplished"
         else:
-            return response  # eg. Sorry, I am not able to physically tidy a desk as I am an AI assistant. Is there anything else I can help you with?
+            return response
 
     def chat_or_request(self, prompt: str) -> str:
         instruction = "You are AGI robot. Decide whether user prompt is just chat or request. Your response should be only 'chat' or 'request'"
@@ -140,13 +146,15 @@ explanation = self.explain_result("take_picture", result)
 
     # actuator
 
-    def explain_result(self, function_name: str, result: str) -> str:
+    def explain_result(self, result: str) -> str:
         # Just talk with user
 
         instruction = f"""You are AGI robot. You got the request :
 {self.prompt}
-        
-Here is the result of the {function_name} take_picture(). Answer to user."""
+
+Answer to user.
+
+Here is the result: """
 
         if self.verbose:
             print("instruction :")

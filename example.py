@@ -20,4 +20,4 @@ main_llm = RobotLLM(
 while True:
     user_input = input("[You] : ")  # "how many people is here?"
     answer = main_llm.input_text(user_input)
-    print(f"[Your AGI] : {answer}")
+    print(f"[Your AGI] : {answer}\n")
