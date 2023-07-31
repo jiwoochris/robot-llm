@@ -164,3 +164,6 @@ Here is the result: """
 
         if self.verbose:
             print(f"[Your AGI] : {response}")
+
+    def follow_up_question(self, result: str) -> str:
+        pass

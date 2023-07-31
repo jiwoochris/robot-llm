@@ -6,5 +6,5 @@ from .base import LLM
 class FakeLLM(LLM):
     """Fake LLM"""
 
-    def call(self, prompt: str) -> str:
+    def call(self, instruction: str, prompt: str) -> str:
         return "fake llm output"
