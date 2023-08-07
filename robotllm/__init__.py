@@ -100,16 +100,6 @@ explanation = self.explain_result(result)
         else:
             return response
 
-    def chat_or_request(self, prompt: str) -> str:
-        instruction = "You are AGI robot. Decide whether user prompt is just chat or request. Your response should be only 'chat' or 'request'"
-
-        response = self.llm.call(instruction, prompt)
-
-        if self.verbose:
-            print(f"Chat or Request? : {response}")
-
-        return response
-
     def is_python_code(self, code_str):
         try:
             compile(code_str, "<string>", "exec")
@@ -164,6 +154,3 @@ Here is the result: """
 
         if self.verbose:
             print(f"[Your AGI] : {response}")
-
-    def follow_up_question(self, result: str) -> str:
-        pass

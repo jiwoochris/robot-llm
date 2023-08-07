@@ -10,8 +10,6 @@ def self.take_picture() -> boxes_and_labels (Yolo)
 def self.explain_result(function_name, result) -> explain :str
 """
 
-# def follow_up_question(self, result: str) -> any follow-up question :str:
-
 llm = OpenAI()
 yolo = YOLOv5()
 
