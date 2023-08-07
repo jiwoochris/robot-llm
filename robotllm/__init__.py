@@ -72,7 +72,7 @@ class RobotLLM:
         instruction = (
             """You are AGI robot. Your goal is to call the appropriate functions.
 Your response must be a python code to conduct user's request for exec.
-Last function should be self.explain_result
+Last function must be self.explain_result()
 Or If any, ask follow-up question to user.
 
 eg. : What is in front of me now?
